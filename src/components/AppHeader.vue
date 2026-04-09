@@ -1,12 +1,38 @@
+<script setup>
+import { useI18n } from '../composables/useI18n'
+
+const { locale, setLocale, t } = useI18n()
+</script>
+
 <template>
   <header class="app-header">
-    <RouterLink class="app-title" to="/">🌍 Global Conflict Monitor</RouterLink>
+    <RouterLink class="app-title" to="/">Global Conflict Monitor</RouterLink>
 
-    <nav class="app-nav" aria-label="Primary navigation">
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/conflicts">Conflicts</RouterLink>
-      <RouterLink to="/countries">Countries</RouterLink>
-    </nav>
+    <div class="header-actions">
+      <nav class="app-nav" aria-label="Primary navigation">
+        <RouterLink to="/">{{ t('nav.home') }}</RouterLink>
+        <RouterLink to="/conflicts">{{ t('nav.conflicts') }}</RouterLink>
+        <RouterLink to="/countries">{{ t('nav.countries') }}</RouterLink>
+      </nav>
+
+      <div class="locale-switcher" aria-label="Language selector">
+        <button
+          type="button"
+          :class="{ 'locale-active': locale === 'ca' }"
+          @click="setLocale('ca')"
+        >
+          CA
+        </button>
+        <span>|</span>
+        <button
+          type="button"
+          :class="{ 'locale-active': locale === 'en' }"
+          @click="setLocale('en')"
+        >
+          EN
+        </button>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -26,6 +52,15 @@
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.2;
+  border-radius: 8px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .app-nav {
@@ -38,14 +73,49 @@
 
 .app-nav a {
   color: #cbd5e1;
+  border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
-  transition: color 160ms ease;
+  transition:
+    color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .app-nav a:hover,
 .app-nav a.router-link-exact-active {
   color: #f59e0b;
+}
+
+.locale-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.locale-switcher button {
+  padding: 0.3rem;
+  color: #cbd5e1;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+  transition: color 160ms ease;
+}
+
+.locale-switcher button:hover,
+.locale-switcher .locale-active {
+  color: #f59e0b;
+}
+
+.app-title:focus-visible,
+.app-nav a:focus-visible,
+.locale-switcher button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45);
+  outline-offset: 4px;
 }
 
 @media (max-width: 640px) {
@@ -54,7 +124,8 @@
     flex-direction: column;
   }
 
-  .app-nav {
+  .app-nav,
+  .header-actions {
     justify-content: flex-start;
   }
 }

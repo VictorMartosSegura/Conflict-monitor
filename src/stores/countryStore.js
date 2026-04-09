@@ -15,10 +15,15 @@ async function requestJson(url) {
 
 export const useCountryStore = defineStore('country', () => {
   const countries = ref([])
+  const currentCountry = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
   const countryCount = computed(() => countries.value.length)
+  const countryCodes = computed(() => countries.value.map((country) => country.code))
+  const countriesSortedByName = computed(() =>
+    [...countries.value].sort((countryA, countryB) => countryA.name.localeCompare(countryB.name)),
+  )
 
   async function runWithLoading(action) {
     loading.value = true
@@ -42,14 +47,20 @@ export const useCountryStore = defineStore('country', () => {
   }
 
   async function fetchCountryById(id) {
-    return runWithLoading(() => requestJson(`${API_BASE_URL}/api/v1/countries/${id}`))
+    return runWithLoading(async () => {
+      currentCountry.value = await requestJson(`${API_BASE_URL}/api/v1/countries/${id}`)
+      return currentCountry.value
+    })
   }
 
   return {
     countries,
+    currentCountry,
     loading,
     error,
     countryCount,
+    countryCodes,
+    countriesSortedByName,
     fetchCountries,
     fetchCountryById,
   }

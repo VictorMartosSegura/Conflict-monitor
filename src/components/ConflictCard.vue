@@ -151,6 +151,11 @@ h2 {
   transform: translateY(-1px);
 }
 
+.details-button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45);
+  outline-offset: 3px;
+}
+
 @media (max-width: 420px) {
   .card-header {
     flex-direction: column;

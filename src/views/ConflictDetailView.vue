@@ -187,6 +187,14 @@ function backToConflicts() {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 800;
+  transition:
+    background 170ms ease,
+    transform 170ms ease;
+}
+
+.back-button:hover {
+  background: #fbbf24;
+  transform: translateY(-1px);
 }
 
 .conflict-header,

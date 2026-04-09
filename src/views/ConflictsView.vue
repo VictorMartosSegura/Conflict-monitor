@@ -1,18 +1,20 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import AppHeader from '../components/AppHeader.vue'
 import ConflictCard from '../components/ConflictCard.vue'
 import { useConflictStore } from '../stores/conflictStore'
 
+const route = useRoute()
 const router = useRouter()
 const conflictStore = useConflictStore()
 const { conflicts, error, loading } = storeToRefs(conflictStore)
 
 const searchQuery = ref('')
 const selectedStatus = ref('ALL')
+const selectedCountryCode = computed(() => route.query.country?.toString() || '')
 
 const statusFilters = [
   { label: 'All', value: 'ALL' },
@@ -48,6 +50,10 @@ function selectFilter(status) {
 function viewConflictDetails(id) {
   router.push(`/conflicts/${id}`)
 }
+
+function clearCountryFilter() {
+  router.push({ path: '/conflicts' })
+}
 </script>
 
 <template>
@@ -78,6 +84,15 @@ function viewConflictDetails(id) {
           {{ filter.label }}
         </button>
       </div>
+    </section>
+
+    <section v-if="selectedCountryCode" class="country-filter-note" aria-label="Country filter note">
+      <div class="country-pill">
+        <span>Filtered by country: {{ selectedCountryCode }}</span>
+        <button type="button" @click="clearCountryFilter">Clear</button>
+      </div>
+
+      <p>Country-based filtering is currently informational (backend endpoint pending).</p>
     </section>
 
     <p v-if="loading" class="state-message">Loading conflicts...</p>
@@ -159,9 +174,12 @@ h1 {
   border: 1px solid #334155;
   border-radius: 8px;
   outline: none;
+  transition:
+    border-color 170ms ease,
+    box-shadow 170ms ease;
 }
 
-.search-label input:focus {
+.search-label input:focus-visible {
   border-color: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
 }
@@ -181,6 +199,12 @@ h1 {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 800;
+  transition:
+    background 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease,
+    color 170ms ease,
+    transform 170ms ease;
 }
 
 .filter-button-active,
@@ -188,6 +212,70 @@ h1 {
   color: #0f172a;
   background: #f59e0b;
   border-color: #f59e0b;
+}
+
+.filter-button:hover {
+  transform: translateY(-1px);
+}
+
+.filter-button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45);
+  outline-offset: 3px;
+}
+
+.country-filter-note {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  color: #cbd5e1;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 8px;
+}
+
+.country-filter-note p {
+  line-height: 1.6;
+}
+
+.country-pill {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.country-pill span {
+  padding: 0.4rem 0.65rem;
+  color: #0f172a;
+  background: #f59e0b;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.country-pill button {
+  padding: 0.45rem 0.75rem;
+  color: #e2e8f0;
+  background: #334155;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  transition:
+    background 170ms ease,
+    box-shadow 170ms ease,
+    color 170ms ease;
+}
+
+.country-pill button:hover {
+  color: #0f172a;
+  background: #fbbf24;
+}
+
+.country-pill button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45);
+  outline-offset: 3px;
 }
 
 .results-section {
