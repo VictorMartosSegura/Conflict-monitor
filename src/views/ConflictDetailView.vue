@@ -22,6 +22,7 @@ const pageLoading = ref(false)
 const secondaryError = ref(null)
 const isEditing = ref(false)
 const saveLoading = ref(false)
+const deleteLoading = ref(false)
 const editForm = ref({
   name: '',
   startDate: '',
@@ -125,17 +126,38 @@ function cancelEditing() {
   isEditing.value = false
 }
 
+async function deleteConflict() {
+  if (!window.confirm(t('deleteConfirm'))) {
+    return
+  }
+
+  deleteLoading.value = true
+
+  try {
+    await conflictStore.deleteConflict(route.params.id)
+    router.push('/conflicts')
+  } catch (caughtError) {
+    secondaryError.value = caughtError instanceof Error ? caughtError.message : t('error')
+  } finally {
+    deleteLoading.value = false
+  }
+}
+
 async function saveConflict() {
   saveLoading.value = true
 
   try {
-    await requestJson(`/api/v1/conflicts/${route.params.id}`, {
+    const response = await fetch(`/api/v1/conflicts/${route.params.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(editForm.value),
     })
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`)
+    }
 
     await conflictStore.fetchConflictById(route.params.id)
     isEditing.value = false
@@ -161,6 +183,9 @@ async function saveConflict() {
         </button>
         <button class="edit-button" type="button" @click="startEditing">
           {{ t('edit') }}
+        </button>
+        <button class="delete-button" type="button" :disabled="deleteLoading" @click="deleteConflict">
+          {{ t('deleteConflict') }}
         </button>
       </div>
 
@@ -293,6 +318,7 @@ async function saveConflict() {
 
 .back-button,
 .edit-button,
+.delete-button,
 .save-button,
 .cancel-button {
   padding: 0.75rem 1rem;
@@ -312,6 +338,11 @@ async function saveConflict() {
   background: #f59e0b;
 }
 
+.delete-button {
+  color: #e2e8f0;
+  background: #334155;
+}
+
 .cancel-button {
   color: #e2e8f0;
   background: #475569;
@@ -319,6 +350,7 @@ async function saveConflict() {
 
 .back-button:hover,
 .edit-button:hover,
+.delete-button:hover,
 .save-button:hover,
 .cancel-button:hover {
   transform: translateY(-1px);
@@ -328,6 +360,11 @@ async function saveConflict() {
 .edit-button:hover,
 .save-button:hover {
   background: #fbbf24;
+}
+
+.delete-button:hover {
+  color: #0f172a;
+  background: #94a3b8;
 }
 
 .cancel-button:hover {

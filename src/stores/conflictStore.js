@@ -12,6 +12,12 @@ async function requestJson(url, options) {
     return null
   }
 
+  const contentType = response.headers.get('content-type') || ''
+
+  if (!contentType.includes('application/json')) {
+    return null
+  }
+
   return response.json()
 }
 
@@ -62,9 +68,7 @@ export const useConflictStore = defineStore('conflict', () => {
 
   async function fetchConflictsByStatus(status) {
     return runWithLoading(async () => {
-      const params = new URLSearchParams({ status })
-
-      conflicts.value = await requestJson(`/api/v1/conflicts?${params}`)
+      conflicts.value = await requestJson(`/api/v1/conflicts?status=${status}`)
       return conflicts.value
     })
   }
@@ -98,6 +102,28 @@ export const useConflictStore = defineStore('conflict', () => {
     })
   }
 
+  async function updateConflict(id, data) {
+    return runWithLoading(async () => {
+      const updatedConflict = await requestJson(`/api/v1/conflicts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      conflicts.value = conflicts.value.map((conflict) =>
+        conflict.id === id ? updatedConflict : conflict,
+      )
+
+      if (currentConflict.value?.id === id) {
+        currentConflict.value = updatedConflict
+      }
+
+      return updatedConflict
+    })
+  }
+
   return {
     conflicts,
     currentConflict,
@@ -112,5 +138,6 @@ export const useConflictStore = defineStore('conflict', () => {
     fetchConflictsByStatus,
     createConflict,
     deleteConflict,
+    updateConflict,
   }
 })

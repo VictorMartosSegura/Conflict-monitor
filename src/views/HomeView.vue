@@ -109,28 +109,6 @@ function goToConflict(id) {
 
         <RouterLink class="section-link" to="/conflicts">{{ t('seeAll') }}</RouterLink>
       </section>
-
-      <section class="about-section">
-        <div class="about-copy">
-          <h2>{{ t('aboutTitle') }}</h2>
-          <p>{{ t('aboutText') }}</p>
-        </div>
-
-        <div class="feature-row">
-          <article class="feature-item">
-            <span>📊</span>
-            <strong>{{ t('statistics') }}</strong>
-          </article>
-          <article class="feature-item">
-            <span>🗺️</span>
-            <strong>{{ t('details') }}</strong>
-          </article>
-          <article class="feature-item">
-            <span>🔍</span>
-            <strong>{{ t('searchFilter') }}</strong>
-          </article>
-        </div>
-      </section>
     </template>
   </main>
 </template>
@@ -204,7 +182,6 @@ h1 {
 }
 
 .recent-section,
-.about-section,
 .state-message {
   padding: clamp(1.25rem, 3vw, 2rem);
   background: #1e293b;
@@ -246,43 +223,6 @@ h2 {
   justify-self: start;
 }
 
-.about-section {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.about-copy {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.feature-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.feature-item {
-  display: grid;
-  justify-items: center;
-  gap: 0.65rem;
-  padding: 1.25rem 1rem;
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.feature-item span {
-  font-size: 1.8rem;
-  line-height: 1;
-}
-
-.feature-item strong {
-  color: #e2e8f0;
-  font-size: 1rem;
-}
-
 .state-message {
   color: #cbd5e1;
   font-weight: 700;
@@ -308,8 +248,7 @@ h2 {
     padding: 3rem 1.25rem;
   }
 
-  .stats-grid,
-  .feature-row {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 }
