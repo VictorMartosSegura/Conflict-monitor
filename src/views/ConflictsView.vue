@@ -5,23 +5,27 @@ import { useRoute, useRouter } from 'vue-router'
 
 import AppHeader from '../components/AppHeader.vue'
 import ConflictCard from '../components/ConflictCard.vue'
+import ConflictForm from '../components/ConflictForm.vue'
+import { useI18n } from '../composables/useI18n'
 import { useConflictStore } from '../stores/conflictStore'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const conflictStore = useConflictStore()
 const { conflicts, error, loading } = storeToRefs(conflictStore)
 
 const searchQuery = ref('')
 const selectedStatus = ref('ALL')
+const showForm = ref(false)
 const selectedCountryCode = computed(() => route.query.country?.toString() || '')
 
-const statusFilters = [
-  { label: 'All', value: 'ALL' },
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Frozen', value: 'FROZEN' },
-  { label: 'Ended', value: 'ENDED' },
-]
+const statusFilters = computed(() => [
+  { label: t('all'), value: 'ALL' },
+  { label: t('active'), value: 'ACTIVE' },
+  { label: t('frozen'), value: 'FROZEN' },
+  { label: t('ended'), value: 'ENDED' },
+])
 
 const filteredConflicts = computed(() => {
   const normalizedQuery = searchQuery.value.trim().toLowerCase()
@@ -54,6 +58,14 @@ function viewConflictDetails(id) {
 function clearCountryFilter() {
   router.push({ path: '/conflicts' })
 }
+
+function openForm() {
+  showForm.value = true
+}
+
+function closeForm() {
+  showForm.value = false
+}
 </script>
 
 <template>
@@ -61,18 +73,26 @@ function clearCountryFilter() {
 
   <main class="conflicts-page">
     <section class="page-heading">
-      <p class="eyebrow">Conflict Intelligence</p>
-      <h1>Conflicts</h1>
-      <p class="page-summary">Track active, frozen, and ended conflicts from one operational view.</p>
+      <div class="page-heading-top">
+        <div>
+          <p class="eyebrow">{{ t('conflictsEyebrow') }}</p>
+          <h1>{{ t('conflicts') }}</h1>
+          <p class="page-summary">{{ t('conflictsSubtitle') }}</p>
+        </div>
+
+        <button class="new-conflict-button" type="button" @click="openForm">
+          {{ t('newConflict') }}
+        </button>
+      </div>
     </section>
 
-    <section class="toolbar" aria-label="Conflict filters">
+    <section class="toolbar" :aria-label="t('filterByStatus')">
       <label class="search-label">
-        <span>Search by name</span>
-        <input v-model="searchQuery" type="search" placeholder="Search conflicts..." />
+        <span>{{ t('search') }}</span>
+        <input v-model="searchQuery" type="search" :placeholder="t('search')" />
       </label>
 
-      <div class="status-filters" aria-label="Filter by status">
+      <div class="status-filters" :aria-label="t('filterByStatus')">
         <button
           v-for="filter in statusFilters"
           :key="filter.value"
@@ -88,20 +108,20 @@ function clearCountryFilter() {
 
     <section v-if="selectedCountryCode" class="country-filter-note" aria-label="Country filter note">
       <div class="country-pill">
-        <span>Filtered by country: {{ selectedCountryCode }}</span>
-        <button type="button" @click="clearCountryFilter">Clear</button>
+        <span>{{ t('countryFilteredBy') }} {{ selectedCountryCode }}</span>
+        <button type="button" @click="clearCountryFilter">{{ t('clear') }}</button>
       </div>
 
-      <p>Country-based filtering is currently informational (backend endpoint pending).</p>
+      <p>{{ t('countryFilterNote') }}</p>
     </section>
 
-    <p v-if="loading" class="state-message">Loading conflicts...</p>
-    <p v-else-if="error" class="state-message error-message">{{ error }}</p>
+    <p v-if="loading" class="state-message">{{ t('loading') }}</p>
+    <p v-else-if="error" class="state-message error-message">{{ t('error') }}: {{ error }}</p>
 
     <section v-else class="results-section" aria-label="Conflict results">
-      <p class="results-count">{{ filteredConflicts.length }} conflicts found</p>
+      <p class="results-count">{{ filteredConflicts.length }} {{ t('conflictsFound') }}</p>
 
-      <p v-if="filteredConflicts.length === 0" class="state-message">No conflicts found</p>
+      <p v-if="filteredConflicts.length === 0" class="state-message">{{ t('noConflictsFound') }}</p>
 
       <div v-else class="conflicts-grid">
         <ConflictCard
@@ -112,6 +132,8 @@ function clearCountryFilter() {
         />
       </div>
     </section>
+
+    <ConflictForm :show="showForm" @close="closeForm" @created="closeForm" />
   </main>
 </template>
 
@@ -123,8 +145,18 @@ function clearCountryFilter() {
 }
 
 .page-heading {
-  max-width: 760px;
   margin-bottom: 2rem;
+}
+
+.page-heading-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-heading-top > div {
+  max-width: 760px;
 }
 
 .eyebrow {
@@ -147,6 +179,30 @@ h1 {
   color: #cbd5e1;
   font-size: 1.05rem;
   line-height: 1.7;
+}
+
+.new-conflict-button {
+  flex: 0 0 auto;
+  padding: 0.9rem 1.1rem;
+  color: #0f172a;
+  background: #f59e0b;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  transition:
+    background 170ms ease,
+    transform 170ms ease;
+}
+
+.new-conflict-button:hover {
+  background: #fbbf24;
+  transform: translateY(-1px);
+}
+
+.new-conflict-button:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45);
+  outline-offset: 3px;
 }
 
 .toolbar {
@@ -309,6 +365,7 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  .page-heading-top,
   .toolbar {
     align-items: stretch;
     flex-direction: column;

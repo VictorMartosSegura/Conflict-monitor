@@ -1,24 +1,153 @@
-import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 
-import { messages } from '../i18n/messages'
-import { useUiStore } from '../stores/uiStore'
+const currentLang = ref('en')
 
-function getMessage(locale, key) {
-  return key.split('.').reduce((value, segment) => value?.[segment], messages[locale])
+const translations = {
+  en: {
+    home: 'Home',
+    conflicts: 'Conflicts',
+    countries: 'Countries',
+    loading: 'Loading...',
+    error: 'Something went wrong',
+    noResults: 'No results found',
+    heroTitle: '🌍 Global Conflict Monitor',
+    heroSubtitle: 'Real-time tracking of worldwide geopolitical conflicts',
+    viewAllConflicts: 'View All Conflicts →',
+    recentActive: 'Recent Active Conflicts',
+    noActiveConflicts: 'No active conflicts at the moment',
+    seeAll: 'See all conflicts →',
+    aboutTitle: 'About this Dashboard',
+    aboutText:
+      'This dashboard monitors global armed conflicts, tracking factions, key events and countries involved.',
+    totalConflicts: 'Total Conflicts',
+    activeNow: 'Active Now',
+    frozen: 'Frozen',
+    countriesCount: 'Countries',
+    newConflict: '+ New Conflict',
+    search: 'Search conflicts...',
+    all: 'All',
+    active: 'Active',
+    ended: 'Ended',
+    conflictsFound: 'conflicts found',
+    noConflictsFound: 'No conflicts found',
+    backToList: '← Back to Conflicts',
+    edit: '✏️ Edit',
+    save: '💾 Save',
+    cancel: 'Cancel',
+    factions: 'Factions',
+    timeline: 'Timeline of Events',
+    noFactions: 'No factions found.',
+    noEvents: 'No events found.',
+    supporters: 'Supporters:',
+    startDate: 'Start date',
+    viewDetails: 'View Details',
+    conflictName: 'Conflict name',
+    description: 'Describe the conflict...',
+    createConflict: 'Create Conflict',
+    status: 'Status',
+    searchCountries: 'Search countries...',
+    countriesFound: 'countries found',
+    noCountriesFound: 'No countries found',
+    countriesSubtitle: 'Search the countries currently tracked in the monitor.',
+    map: '🗺️ Map',
+    events: 'Events',
+    started: 'Started',
+    noDescription: 'No description available.',
+    dateUnknown: 'Date unknown',
+    recentSummary: 'Current flashpoints surfaced from the active conflicts feed.',
+    statistics: 'Statistics',
+    details: 'Details',
+    searchFilter: 'Search & Filter',
+    filterByStatus: 'Filter by status',
+    countryFilteredBy: 'Filtered by country:',
+    clear: 'Clear',
+    countryFilterNote: 'Country-based filtering is currently informational (backend endpoint pending).',
+    editConflict: 'Edit Conflict',
+    detailSupportError: 'Unable to load supporting data',
+    mapUnavailable: 'Map preview is unavailable.',
+    totalFactions: 'Total factions:',
+    conflictsByStatus: 'Conflicts by Status',
+    conflictsEyebrow: 'Conflict Intelligence',
+    conflictsSubtitle: 'Track active, frozen, and ended conflicts from one operational view.',
+    countriesEyebrow: 'Reference Desk',
+  },
+  ca: {
+    home: 'Inici',
+    conflicts: 'Conflictes',
+    countries: 'Països',
+    loading: 'Carregant...',
+    error: 'Alguna cosa ha fallat',
+    noResults: "No s'han trobat resultats",
+    heroTitle: '🌍 Monitor Global de Conflictes',
+    heroSubtitle: 'Seguiment en temps real de conflictes geopolítics mundials',
+    viewAllConflicts: 'Veure tots els conflictes →',
+    recentActive: 'Conflictes Actius Recents',
+    noActiveConflicts: 'No hi ha conflictes actius en aquest moment',
+    seeAll: 'Veure tots els conflictes →',
+    aboutTitle: 'Sobre aquest Dashboard',
+    aboutText:
+      'Aquest dashboard monitora conflictes armats globals, fent seguiment de faccions, esdeveniments clau i països implicats.',
+    totalConflicts: 'Total Conflictes',
+    activeNow: 'Actius Ara',
+    frozen: 'Congelats',
+    countriesCount: 'Països',
+    newConflict: '+ Nou Conflicte',
+    search: 'Cercar conflictes...',
+    all: 'Tots',
+    active: 'Actiu',
+    ended: 'Finalitzat',
+    conflictsFound: 'conflictes trobats',
+    noConflictsFound: "No s'han trobat conflictes",
+    backToList: '← Tornar a la llista',
+    edit: '✏️ Editar',
+    save: '💾 Desar',
+    cancel: 'Cancel·lar',
+    factions: 'Faccions',
+    timeline: "Línia de temps d'esdeveniments",
+    noFactions: "No s'han trobat faccions.",
+    noEvents: "No s'han trobat esdeveniments.",
+    supporters: 'Supporters:',
+    startDate: "Data d'inici",
+    viewDetails: 'Veure Detalls',
+    conflictName: 'Nom del conflicte',
+    description: 'Descriu el conflicte...',
+    createConflict: 'Crear Conflicte',
+    status: 'Estat',
+    searchCountries: 'Cercar països...',
+    countriesFound: 'països trobats',
+    noCountriesFound: "No s'han trobat països",
+    countriesSubtitle: 'Cerca els països actualment seguits pel monitor.',
+    map: '🗺️ Mapa',
+    events: 'Esdeveniments',
+    started: 'Iniciat',
+    noDescription: 'No hi ha descripció disponible.',
+    dateUnknown: 'Data desconeguda',
+    recentSummary: 'Punts calents actuals destacats del flux de conflictes actius.',
+    statistics: 'Estadístiques',
+    details: 'Detalls',
+    searchFilter: 'Cerca i Filtre',
+    filterByStatus: 'Filtra per estat',
+    countryFilteredBy: 'Filtrat per país:',
+    clear: 'Netejar',
+    countryFilterNote:
+      "El filtratge per país és actualment informatiu (endpoint backend pendent).",
+    editConflict: 'Editar Conflicte',
+    detailSupportError: 'No s’han pogut carregar les dades de suport',
+    mapUnavailable: 'La previsualització del mapa no està disponible.',
+    totalFactions: 'Total faccions:',
+    conflictsByStatus: 'Conflictes per Estat',
+    conflictsEyebrow: 'Intel·ligència de conflictes',
+    conflictsSubtitle: 'Segueix conflictes actius, congelats i finalitzats des d’una vista operativa.',
+    countriesEyebrow: 'Taula de referència',
+  },
 }
 
-export function useI18n() {
-  const uiStore = useUiStore()
-  const { locale } = storeToRefs(uiStore)
-
-  function t(key) {
-    return getMessage(locale.value, key) || getMessage('en', key) || key
-  }
-
-  return {
-    locale,
-    setLocale: uiStore.setLocale,
-    t,
-    toggleLocale: uiStore.toggleLocale,
+const setLang = (lang) => {
+  if (translations[lang]) {
+    currentLang.value = lang
   }
 }
+
+const t = (key) => translations[currentLang.value]?.[key] || translations.en[key] || key
+
+export const useI18n = () => ({ t, currentLang, setLang })

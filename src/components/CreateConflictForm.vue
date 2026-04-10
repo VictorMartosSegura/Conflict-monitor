@@ -2,12 +2,14 @@
 import { reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
+import { useI18n } from '../composables/useI18n'
 import { useConflictStore } from '../stores/conflictStore'
 
 const emit = defineEmits(['created', 'cancel'])
 
 const conflictStore = useConflictStore()
 const { error } = storeToRefs(conflictStore)
+const { t } = useI18n()
 
 const form = reactive({
   name: '',
@@ -29,23 +31,23 @@ function validateForm() {
   clearErrors()
 
   if (!form.name.trim()) {
-    errors.name = 'Name is required.'
+    errors.name = `${t('conflictName')} is required.`
   } else if (form.name.trim().length < 3) {
-    errors.name = 'Name must be at least 3 characters.'
+    errors.name = `${t('conflictName')} must be at least 3 characters.`
   }
 
   if (!form.startDate) {
-    errors.startDate = 'Start date is required.'
+    errors.startDate = `${t('startDate')} is required.`
   }
 
   if (!form.status) {
-    errors.status = 'Status is required.'
+    errors.status = `${t('status')} is required.`
   }
 
   if (!form.description.trim()) {
-    errors.description = 'Description is required.'
+    errors.description = `${t('description')} is required.`
   } else if (form.description.trim().length < 10) {
-    errors.description = 'Description must be at least 10 characters.'
+    errors.description = `${t('description')} must be at least 10 characters.`
   }
 
   return Object.keys(errors).length === 0
@@ -89,29 +91,29 @@ async function submitForm() {
     <div class="form-header">
       <div>
         <p class="eyebrow">New Record</p>
-        <h2>Create New Conflict</h2>
+        <h2>{{ t('createConflict') }}</h2>
       </div>
 
-      <button class="ghost-button" type="button" @click="emit('cancel')">Cancel</button>
+      <button class="ghost-button" type="button" @click="emit('cancel')">{{ t('cancel') }}</button>
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
 
     <label>
-      <span>Name</span>
-      <input v-model="form.name" type="text" required placeholder="Conflict name" />
+      <span>{{ t('conflictName') }}</span>
+      <input v-model="form.name" type="text" required :placeholder="t('conflictName')" />
       <small v-if="errors.name">{{ errors.name }}</small>
     </label>
 
     <div class="form-grid">
       <label>
-        <span>Start Date</span>
+        <span>{{ t('startDate') }}</span>
         <input v-model="form.startDate" type="date" required />
         <small v-if="errors.startDate">{{ errors.startDate }}</small>
       </label>
 
       <label>
-        <span>Status</span>
+        <span>{{ t('status') }}</span>
         <select v-model="form.status" required>
           <option value="ACTIVE">ACTIVE</option>
           <option value="FROZEN">FROZEN</option>
@@ -122,13 +124,13 @@ async function submitForm() {
     </div>
 
     <label>
-      <span>Description</span>
-      <textarea v-model="form.description" required rows="5" placeholder="Situation summary" />
+      <span>{{ t('description') }}</span>
+      <textarea v-model="form.description" required rows="5" :placeholder="t('description')" />
       <small v-if="errors.description">{{ errors.description }}</small>
     </label>
 
     <button class="submit-button" type="submit" :disabled="isSubmitting">
-      {{ isSubmitting ? 'Creating...' : 'Create Conflict' }}
+      {{ isSubmitting ? `${t('createConflict')}...` : t('createConflict') }}
     </button>
   </form>
 </template>

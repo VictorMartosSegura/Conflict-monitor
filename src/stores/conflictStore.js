@@ -1,8 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-const API_BASE_URL = 'http://localhost:8080'
-
 async function requestJson(url, options) {
   const response = await fetch(url, options)
 
@@ -50,14 +48,14 @@ export const useConflictStore = defineStore('conflict', () => {
 
   async function fetchConflicts() {
     return runWithLoading(async () => {
-      conflicts.value = await requestJson(`${API_BASE_URL}/api/v1/conflicts`)
+      conflicts.value = await requestJson('/api/v1/conflicts')
       return conflicts.value
     })
   }
 
   async function fetchConflictById(id) {
     return runWithLoading(async () => {
-      currentConflict.value = await requestJson(`${API_BASE_URL}/api/v1/conflicts/${id}`)
+      currentConflict.value = await requestJson(`/api/v1/conflicts/${id}`)
       return currentConflict.value
     })
   }
@@ -66,14 +64,14 @@ export const useConflictStore = defineStore('conflict', () => {
     return runWithLoading(async () => {
       const params = new URLSearchParams({ status })
 
-      conflicts.value = await requestJson(`${API_BASE_URL}/api/v1/conflicts?${params}`)
+      conflicts.value = await requestJson(`/api/v1/conflicts?${params}`)
       return conflicts.value
     })
   }
 
   async function createConflict(data) {
     return runWithLoading(async () => {
-      const conflict = await requestJson(`${API_BASE_URL}/api/v1/conflicts`, {
+      const conflict = await requestJson('/api/v1/conflicts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +86,7 @@ export const useConflictStore = defineStore('conflict', () => {
 
   async function deleteConflict(id) {
     return runWithLoading(async () => {
-      await requestJson(`${API_BASE_URL}/api/v1/conflicts/${id}`, {
+      await requestJson(`/api/v1/conflicts/${id}`, {
         method: 'DELETE',
       })
 

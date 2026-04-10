@@ -1,8 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-const API_BASE_URL = 'http://localhost:8080'
-
 async function requestJson(url) {
   const response = await fetch(url)
 
@@ -41,14 +39,14 @@ export const useCountryStore = defineStore('country', () => {
 
   async function fetchCountries() {
     return runWithLoading(async () => {
-      countries.value = await requestJson(`${API_BASE_URL}/api/v1/countries`)
+      countries.value = await requestJson('/api/v1/countries')
       return countries.value
     })
   }
 
   async function fetchCountryById(id) {
     return runWithLoading(async () => {
-      currentCountry.value = await requestJson(`${API_BASE_URL}/api/v1/countries/${id}`)
+      currentCountry.value = await requestJson(`/api/v1/countries/${id}`)
       return currentCountry.value
     })
   }

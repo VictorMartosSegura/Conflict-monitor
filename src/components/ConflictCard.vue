@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
 
+import { useI18n } from '../composables/useI18n'
+
 const props = defineProps({
   conflict: {
     type: Object,
@@ -12,9 +14,11 @@ const emit = defineEmits({
   select: (id) => id !== undefined && id !== null,
 })
 
+const { t } = useI18n()
+
 const formattedStartDate = computed(() => {
   if (!props.conflict.startDate) {
-    return 'Date unknown'
+    return t('dateUnknown')
   }
 
   const date = new Date(props.conflict.startDate)
@@ -27,7 +31,7 @@ const formattedStartDate = computed(() => {
 })
 
 const shortDescription = computed(() => {
-  const description = props.conflict.description || 'No description available.'
+  const description = props.conflict.description || t('noDescription')
 
   return description.length > 100 ? `${description.slice(0, 100)}...` : description
 })
@@ -39,7 +43,7 @@ const statusClass = computed(() => `status-${props.conflict.status?.toLowerCase(
   <article class="conflict-card">
     <div class="card-header">
       <div>
-        <p class="eyebrow">Started {{ formattedStartDate }}</p>
+        <p class="eyebrow">{{ t('started') }} {{ formattedStartDate }}</p>
         <h2>{{ conflict.name }}</h2>
       </div>
 
@@ -51,7 +55,7 @@ const statusClass = computed(() => `status-${props.conflict.status?.toLowerCase(
     <p class="description">{{ shortDescription }}</p>
 
     <button class="details-button" type="button" @click="emit('select', conflict.id)">
-      View Details
+      {{ t('viewDetails') }}
     </button>
   </article>
 </template>
