@@ -1,8 +1,23 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-async function requestJson(url, options) {
-  const response = await fetch(url, options)
+const API_URL = import.meta.env.VITE_API_URL || ''
+
+function buildApiUrl(path) {
+  return `${API_URL}${path}`
+}
+
+function isSpringErrorPayload(data) {
+  return (
+    data &&
+    typeof data === 'object' &&
+    !Array.isArray(data) &&
+    ('timestamp' in data || 'error' in data || 'status' in data || 'path' in data)
+  )
+}
+
+async function requestJson(path, options) {
+  const response = await fetch(buildApiUrl(path), options)
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`)
@@ -18,7 +33,13 @@ async function requestJson(url, options) {
     return null
   }
 
-  return response.json()
+  const data = await response.json()
+
+  if (isSpringErrorPayload(data)) {
+    throw new Error(data.error || `Request failed with status ${data.status}`)
+  }
+
+  return data
 }
 
 export const useConflictStore = defineStore('conflict', () => {
@@ -54,21 +75,39 @@ export const useConflictStore = defineStore('conflict', () => {
 
   async function fetchConflicts() {
     return runWithLoading(async () => {
-      conflicts.value = await requestJson('/api/v1/conflicts')
+      const data = await requestJson('/api/v1/conflicts')
+
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid conflicts response')
+      }
+
+      conflicts.value = data
       return conflicts.value
     })
   }
 
   async function fetchConflictById(id) {
     return runWithLoading(async () => {
-      currentConflict.value = await requestJson(`/api/v1/conflicts/${id}`)
+      const data = await requestJson(`/api/v1/conflicts/${id}`)
+
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        throw new Error('Invalid conflict response')
+      }
+
+      currentConflict.value = data
       return currentConflict.value
     })
   }
 
   async function fetchConflictsByStatus(status) {
     return runWithLoading(async () => {
-      conflicts.value = await requestJson(`/api/v1/conflicts?status=${status}`)
+      const data = await requestJson(`/api/v1/conflicts?status=${status}`)
+
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid conflicts response')
+      }
+
+      conflicts.value = data
       return conflicts.value
     })
   }
@@ -82,6 +121,10 @@ export const useConflictStore = defineStore('conflict', () => {
         },
         body: JSON.stringify(data),
       })
+
+      if (!conflict || typeof conflict !== 'object' || Array.isArray(conflict)) {
+        throw new Error('Invalid conflict response')
+      }
 
       conflicts.value.push(conflict)
       return conflict
@@ -111,6 +154,10 @@ export const useConflictStore = defineStore('conflict', () => {
         },
         body: JSON.stringify(data),
       })
+
+      if (!updatedConflict || typeof updatedConflict !== 'object' || Array.isArray(updatedConflict)) {
+        throw new Error('Invalid conflict response')
+      }
 
       conflicts.value = conflicts.value.map((conflict) =>
         conflict.id === id ? updatedConflict : conflict,
